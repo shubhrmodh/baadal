@@ -1,0 +1,94 @@
+package com.example.baadal.model
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.media.MediaMetadataRetriever
+import androidx.appcompat.app.AlertDialog
+import com.example.baadal.R
+import com.example.baadal.screen.PlayerActivity
+import com.example.baadal.screen.PlayerActivity.Companion.musicListPA
+import com.example.baadal.screen.PlayerActivity.Companion.songPosition
+import com.google.android.material.color.MaterialColors
+import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
+
+data class Music(
+    val id: String,
+    val title: String,
+    val album: String,
+    val artist: String,
+    val duration: Long = 0,
+    val path: String,
+    val artUri: String
+)
+
+class Playlist {
+    lateinit var name: String
+    lateinit var playlist: ArrayList<Music>
+    lateinit var createdBy: String
+    lateinit var createdOn: String
+}
+
+class MusicPlaylist {
+    var ref: ArrayList<Playlist> = ArrayList()
+}
+
+@SuppressLint("DefaultLocale")
+fun formatDuration(duration: Long): String {
+    val minutes = TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS)
+    val seconds = (TimeUnit.SECONDS.convert(duration, TimeUnit.MILLISECONDS) -
+            minutes * TimeUnit.SECONDS.convert(1, TimeUnit.MINUTES))
+    return String.format("%02d:%02d", minutes, seconds)
+}
+
+fun exitApplication() {
+    if (PlayerActivity.musicService != null) {
+//        PlayerActivity.musicService!!.audioManager.abandonAudioFocus(PlayerActivity.musicService)
+        PlayerActivity.musicService!!.stopForeground(true)
+        PlayerActivity.musicService!!.mediaPlayer!!.release()
+        PlayerActivity.musicService = null
+    }
+    exitProcess(1)
+}
+
+fun setSongPosition(increment: Boolean) {
+    if (!PlayerActivity.repeat){
+        if (increment) {
+            if (musicListPA.size - 1 == songPosition) songPosition = 0
+            else ++songPosition
+        } else {
+            if (0 == songPosition) songPosition = musicListPA.size - 1
+            else --songPosition
+        }
+    }
+}
+
+fun getImgArt(path: String): ByteArray? {
+    val retriever = MediaMetadataRetriever()
+    retriever.setDataSource(path)
+    return retriever.embeddedPicture
+}
+
+fun setDialogBtnBackground(context: Context, dialog: AlertDialog) {
+    dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE)?.setTextColor(
+        MaterialColors.getColor(context, R.attr.dialogTextColor, Color.WHITE)
+    )
+    dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)?.setTextColor(
+        MaterialColors.getColor(context, R.attr.dialogTextColor, Color.WHITE)
+    )
+    dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE)?.setBackgroundColor(
+        MaterialColors.getColor(context, R.attr.dialogBtnBackground, Color.GRAY)
+    )
+    dialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)?.setBackgroundColor(
+        MaterialColors.getColor(context, R.attr.dialogBtnBackground, Color.GRAY)
+    )
+}
+
+fun getMainColor(img: Bitmap): Int {
+    val newImg = Bitmap.createScaledBitmap(img, 1, 1, true)
+    val color = newImg.getPixel(0, 0)
+    newImg.recycle()
+    return color
+}
