@@ -26,6 +26,7 @@ import com.example.baadal.databinding.ActivityPlayerBinding
 import com.example.baadal.model.Music
 import com.example.baadal.model.MusicService
 import com.example.baadal.model.exitApplication
+import com.example.baadal.model.favouriteChecker
 import com.example.baadal.model.formatDuration
 import com.example.baadal.model.getImgArt
 import com.example.baadal.model.getMainColor
@@ -139,6 +140,85 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
             shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(musicListPA[songPosition].path))
             startActivity(Intent.createChooser(shareIntent, "Sharing Music File!!"))
         }
+        playerBinding.favouriteBtnPA.setOnClickListener {
+            fIndex = favouriteChecker(musicListPA[songPosition].id)
+            if (isFavourite) {
+                isFavourite = false
+                playerBinding.favouriteBtnPA.setImageResource(R.drawable.fav_outlined)
+                FavouriteActivity.favouriteSongs.removeAt(fIndex)
+            } else {
+                isFavourite = true
+                playerBinding.favouriteBtnPA.setImageResource(R.drawable.ic_favorite)
+                FavouriteActivity.favouriteSongs.add(musicListPA[songPosition])
+            }
+            FavouriteActivity.favChanged = true
+        }
+    }
+
+    private fun initializeLayout() {
+        songPosition = intent.getIntExtra("index", 0)
+        when (intent.getStringExtra("class")) {
+            "NowPlaying" -> {
+                setLayout()
+                playerBinding.tvSeekBarStart.text = formatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
+                playerBinding.tvSeekBarEnd.text = formatDuration(musicService!!.mediaPlayer!!.duration.toLong())
+                playerBinding.seekBarPA.progress = musicService!!.mediaPlayer!!.currentPosition
+                playerBinding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
+                if (isPlaying) playerBinding.playPauseBtnPA.setIconResource(R.drawable.pause)
+                else playerBinding.playPauseBtnPA.setIconResource(R.drawable.play)
+            }
+            "MusicAdapterSearch" -> initServiceAndPlaylist(MainActivity.musicListSearch, shuffle = false)
+            "MusicAdapter" -> initServiceAndPlaylist(MainActivity.MusicListMA, shuffle = false)
+            "FavouriteAdapter" -> initServiceAndPlaylist(FavouriteActivity.favouriteSongs, shuffle = false)
+            "MainActivity" -> initServiceAndPlaylist(MainActivity.MusicListMA, shuffle = true)
+            "FavouriteShuffle" -> initServiceAndPlaylist(FavouriteActivity.favouriteSongs, shuffle = true)
+        }
+        if (musicService != null && !isPlaying) playMusic()
+    }
+
+    private fun setLayout() {
+        fIndex = favouriteChecker(musicListPA[songPosition].id)
+        Glide.with(applicationContext)
+            .load(musicListPA[songPosition].artUri)
+            .apply(RequestOptions().placeholder(R.drawable.baadal).centerCrop())
+            .into(playerBinding.songImgPA)
+        playerBinding.songNamePA.text = musicListPA[songPosition].title
+        if (repeat) playerBinding.repeatBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.black))
+        if(min5 || min10 || min15) playerBinding.timerBtnPA.setColorFilter(ContextCompat.getColor(applicationContext, R.color.teal_700))
+        if(isFavourite) playerBinding.favouriteBtnPA.setImageResource(R.drawable.ic_favorite)
+        else playerBinding.favouriteBtnPA.setImageResource(R.drawable.fav_outlined)
+
+        val img = getImgArt(musicListPA[songPosition].path)
+        val image = if (img != null) {
+            BitmapFactory.decodeByteArray(img, 0, img.size)
+        } else {
+            BitmapFactory.decodeResource(
+                resources,
+                R.drawable.baadal
+            )
+        }
+        val bgColor = getMainColor(image)
+        val gradient = GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, intArrayOf(0xFFFFFF, bgColor))
+        playerBinding.root.background = gradient
+        window?.statusBarColor = bgColor
+    }
+
+    private fun createMediaPlayer(){
+        try {
+            if (musicService!!.mediaPlayer == null) musicService!!.mediaPlayer = MediaPlayer()
+            musicService!!.mediaPlayer!!.reset()
+            musicService!!.mediaPlayer!!.setDataSource(musicListPA[songPosition].path)
+            musicService!!.mediaPlayer!!.prepare()
+            playerBinding.tvSeekBarStart.text = formatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
+            playerBinding.tvSeekBarEnd.text = formatDuration(musicService!!.mediaPlayer!!.duration.toLong())
+            playerBinding.seekBarPA.progress = 0
+            playerBinding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
+            musicService!!.mediaPlayer!!.setOnCompletionListener(this)
+            nowPlayingId = musicListPA[songPosition].id
+            playMusic()
+            loudnessEnhancer = LoudnessEnhancer(musicService!!.mediaPlayer!!.audioSessionId)
+            loudnessEnhancer.enabled = true
+        }catch (e: Exception){ Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()}
     }
 
     private fun showBottomSheetDialog() {
@@ -194,25 +274,6 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
         }
     }
 
-    private fun initializeLayout() {
-        songPosition = intent.getIntExtra("index", 0)
-        when (intent.getStringExtra("class")) {
-            "NowPlaying" -> {
-                setLayout()
-                playerBinding.tvSeekBarStart.text = formatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
-                playerBinding.tvSeekBarEnd.text = formatDuration(musicService!!.mediaPlayer!!.duration.toLong())
-                playerBinding.seekBarPA.progress = musicService!!.mediaPlayer!!.currentPosition
-                playerBinding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
-                if (isPlaying) playerBinding.playPauseBtnPA.setIconResource(R.drawable.pause)
-                else playerBinding.playPauseBtnPA.setIconResource(R.drawable.play)
-            }
-            "MusicAdapterSearch" -> initServiceAndPlaylist(MainActivity.musicListSearch, shuffle = false)
-            "MusicAdapter" -> initServiceAndPlaylist(MainActivity.MusicListMA, shuffle = false)
-            "MainActivity" -> initServiceAndPlaylist(MainActivity.MusicListMA, shuffle = true)
-        }
-        if (musicService != null && !isPlaying) playMusic()
-    }
-
     private fun initServiceAndPlaylist(
         playlist : ArrayList<Music>,
         shuffle: Boolean,
@@ -226,54 +287,6 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
         if (shuffle) musicListPA.shuffle()
         setLayout()
     }
-
-    private fun setLayout() {
-//        fIndex = favouriteChecker(musicListPA[songPosition].id)
-        Glide.with(applicationContext)
-            .load(musicListPA[songPosition].artUri)
-            .apply(RequestOptions().placeholder(R.drawable.baadal).centerCrop())
-            .into(playerBinding.songImgPA)
-        playerBinding.songNamePA.text = musicListPA[songPosition].title
-        if (repeat) playerBinding.repeatBtnPA.setColorFilter(ContextCompat.getColor(this, R.color.black))
-        if(min5 || min10 || min15) playerBinding.timerBtnPA.setColorFilter(ContextCompat.getColor(applicationContext, R.color.teal_700))
-        if(isFavourite) playerBinding.favouriteBtnPA.setImageResource(R.drawable.ic_favorite)
-        else playerBinding.favouriteBtnPA.setImageResource(R.drawable.fav_outlined)
-
-        val img = getImgArt(musicListPA[songPosition].path)
-        val image = if (img != null) {
-            BitmapFactory.decodeByteArray(img, 0, img.size)
-        } else {
-            BitmapFactory.decodeResource(
-                resources,
-                R.drawable.baadal
-            )
-        }
-        val bgColor = getMainColor(image)
-        val gradient = GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, intArrayOf(0xFFFFFF, bgColor))
-        playerBinding.root.background = gradient
-        window?.statusBarColor = bgColor
-    }
-
-    private fun createMediaPlayer(){
-        try {
-            if (musicService!!.mediaPlayer == null) musicService!!.mediaPlayer = MediaPlayer()
-            musicService!!.mediaPlayer!!.reset()
-            musicService!!.mediaPlayer!!.setDataSource(musicListPA[songPosition].path)
-            musicService!!.mediaPlayer!!.prepare()
-            musicService!!.mediaPlayer!!.start()
-            isPlaying = true
-            playerBinding.playPauseBtnPA.setIconResource(R.drawable.pause)
-            musicService!!.showNotification(R.drawable.pause)
-            playerBinding.tvSeekBarStart.text = formatDuration(musicService!!.mediaPlayer!!.currentPosition.toLong())
-            playerBinding.tvSeekBarEnd.text = formatDuration(musicService!!.mediaPlayer!!.duration.toLong())
-            playerBinding.seekBarPA.progress = 0
-            playerBinding.seekBarPA.max = musicService!!.mediaPlayer!!.duration
-            musicService!!.mediaPlayer!!.setOnCompletionListener(this)
-            nowPlayingId = musicListPA[songPosition].id
-            playMusic()
-            loudnessEnhancer = LoudnessEnhancer(musicService!!.mediaPlayer!!.audioSessionId)
-            loudnessEnhancer.enabled = true
-        }catch (e: Exception){ Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()} }
 
     private fun playMusic(){
         isPlaying = true
@@ -304,8 +317,11 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
     }
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        val binder = service as MusicService.MyBinder
-        musicService = binder.currentService()
+        if (musicService == null){
+            val binder = service as MusicService.MyBinder
+            musicService = binder.currentService()
+//            musicService!!.aud
+        }
         createMediaPlayer()
         musicService!!.seekBarSetup()
     }

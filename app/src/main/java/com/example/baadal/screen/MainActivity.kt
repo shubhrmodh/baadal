@@ -25,6 +25,8 @@ import com.example.baadal.model.Music
 import com.example.baadal.model.exitApplication
 import com.example.baadal.model.setDialogBtnBackground
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -55,7 +57,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        themeIndex = getSharedPreferences("THEMES", MODE_PRIVATE)   .getInt("themeIndex", 0)
+        themeIndex = getSharedPreferences("THEMES", MODE_PRIVATE).getInt("themeIndex", 0)
         setTheme(currentThemeNav[themeIndex])
         mainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mainBinding.root)
@@ -69,9 +71,22 @@ class MainActivity : AppCompatActivity() {
             Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_NO)
             Toast.makeText(this, "Black Theme Works in Dark", Toast.LENGTH_LONG).show()
 
-        if (requestRuntimePermission()) { initializeLayout() }
+        if (requestRuntimePermission()) {
+            initializeLayout()
+
+            FavouriteActivity.favouriteSongs = ArrayList()
+            val editor = getSharedPreferences("FAVOURITES", MODE_PRIVATE)
+            val jsonString = editor.getString("FavouriteSongs", null)
+            val typeToken = object : TypeToken<ArrayList<Music>>(){}.type
+            if (jsonString != null) {
+                val data : ArrayList<Music> = GsonBuilder().create().fromJson(jsonString, typeToken)
+                FavouriteActivity.favouriteSongs.addAll(data)
+            }
+
+        }
+
         mainBinding.favBtn.setOnClickListener {
-            startActivity(Intent(this, FavoriteActivity::class.java))
+            startActivity(Intent(this, FavouriteActivity::class.java))
         }
         mainBinding.shuffleBtn.setOnClickListener {
             startActivity(Intent(this, PlayerActivity::class.java)
@@ -84,9 +99,9 @@ class MainActivity : AppCompatActivity() {
 
         mainBinding.navView.setNavigationItemSelectedListener {
             when(it.itemId) {
-                R.id.navFeedback -> startActivity(Intent(this, FavoriteActivity::class.java))
-                R.id.navSettings -> startActivity(Intent(this, FavoriteActivity::class.java))
-                R.id.navAbout -> startActivity(Intent(this, FavoriteActivity::class.java))
+                R.id.navFeedback -> startActivity(Intent(this, FavouriteActivity::class.java))
+                R.id.navSettings -> startActivity(Intent(this, FavouriteActivity::class.java))
+                R.id.navAbout -> startActivity(Intent(this, FavouriteActivity::class.java))
                 R.id.navExit -> {
                     val builder = MaterialAlertDialogBuilder(this).setTitle("Exit")
                         .setMessage("Do you want to close app?")
@@ -204,8 +219,6 @@ class MainActivity : AppCompatActivity() {
                         artUri = artUriC
                     )
                     if (File(music.path).exists()) tempList.add(music)
-
-
                 }while (cursor.moveToNext())
                 cursor.close()
         }
@@ -219,8 +232,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val editor = getSharedPreferences("FAVOURITES", MODE_PRIVATE).edit()
 
+        val editor = getSharedPreferences("FAVOURITES", MODE_PRIVATE).edit()
+        val jsonString = GsonBuilder().create().toJson(FavouriteActivity.favouriteSongs)
+        editor.putString("FavouriteSongs", jsonString)
+//        val jsonStringPlaylist = GsonBuilder().create().toJson(PlaylistActivity.musicPlaylist)
+//        editor.putString("MusicPlaylist", jsonStringPlaylist)
+        editor.apply()
         if (PlayerActivity.musicService != null) mainBinding.nowPlaying.visibility = View.VISIBLE
     }
 

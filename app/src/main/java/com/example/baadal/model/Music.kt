@@ -7,10 +7,12 @@ import android.graphics.Color
 import android.media.MediaMetadataRetriever
 import androidx.appcompat.app.AlertDialog
 import com.example.baadal.R
+import com.example.baadal.screen.FavouriteActivity
 import com.example.baadal.screen.PlayerActivity
 import com.example.baadal.screen.PlayerActivity.Companion.musicListPA
 import com.example.baadal.screen.PlayerActivity.Companion.songPosition
 import com.google.android.material.color.MaterialColors
+import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
@@ -29,6 +31,17 @@ class Playlist {
     lateinit var playlist: ArrayList<Music>
     lateinit var createdBy: String
     lateinit var createdOn: String
+}
+
+fun checkPlaylist(playlist: ArrayList<Music>): ArrayList<Music> {
+    val indicesToRemove = mutableListOf<Int>()
+    playlist.forEachIndexed { index, music ->
+        if (!File(music.path).exists()) indicesToRemove.add(index)
+    }
+
+    indicesToRemove.sortDescending()
+    indicesToRemove.forEach { index -> playlist.removeAt(index)}
+    return playlist
 }
 
 class MusicPlaylist {
@@ -51,6 +64,17 @@ fun exitApplication() {
         PlayerActivity.musicService = null
     }
     exitProcess(1)
+}
+
+fun favouriteChecker(id: String): Int {
+    PlayerActivity.isFavourite = false
+    FavouriteActivity.favouriteSongs.forEachIndexed { index, music ->
+        if (id == music.id) {
+            PlayerActivity.isFavourite = true
+            return index
+        }
+    }
+    return -1
 }
 
 fun setSongPosition(increment: Boolean) {

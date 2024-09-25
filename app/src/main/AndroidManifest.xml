@@ -44,7 +44,7 @@
             android:screenOrientation="sensorPortrait"
             tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
-            android:name=".screen.FavoriteActivity"
+            android:name=".screen.FavouriteActivity"
             android:configChanges="uiMode|orientation"
             android:screenOrientation="sensorPortrait"
             tools:ignore="DiscouragedApi,LockedOrientationActivity" />
