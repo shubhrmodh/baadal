@@ -29,8 +29,11 @@ data class Music(
 class Playlist {
     lateinit var name: String
     lateinit var playlist: ArrayList<Music>
-    lateinit var createdBy: String
     lateinit var createdOn: String
+}
+
+class MusicPlaylist {
+    var ref: ArrayList<Playlist> = ArrayList()
 }
 
 fun checkPlaylist(playlist: ArrayList<Music>): ArrayList<Music> {
@@ -44,10 +47,6 @@ fun checkPlaylist(playlist: ArrayList<Music>): ArrayList<Music> {
     return playlist
 }
 
-class MusicPlaylist {
-    var ref: ArrayList<Playlist> = ArrayList()
-}
-
 @SuppressLint("DefaultLocale")
 fun formatDuration(duration: Long): String {
     val minutes = TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS)
@@ -58,7 +57,7 @@ fun formatDuration(duration: Long): String {
 
 fun exitApplication() {
     if (PlayerActivity.musicService != null) {
-//        PlayerActivity.musicService!!.audioManager.abandonAudioFocus(PlayerActivity.musicService)
+        PlayerActivity.musicService!!.audioManager.abandonAudioFocus(PlayerActivity.musicService)
         PlayerActivity.musicService!!.stopForeground(true)
         PlayerActivity.musicService!!.mediaPlayer!!.release()
         PlayerActivity.musicService = null

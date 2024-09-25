@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="HardCodedText"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="15dp"
+    app:strokeWidth="2dp"
+    app:strokeColor="@color/cool_blue"
+    android:layout_margin="10dp"
+    app:cardBackgroundColor="@color/white">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/playlistImg"
+        android:layout_width="170dp"
+        android:layout_height="130dp"
+        android:src="@drawable/baadal"
+        android:layout_gravity="center_horizontal"
+        app:shapeAppearanceOverlay="@style/curved"
+        android:contentDescription="song_img"/>
+
+    <TextView
+        android:id="@+id/playlistName"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="130dp"
+        android:contentDescription="playlist_name"
+        android:ellipsize="marquee"
+        android:gravity="center"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:text="playlist_name"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        tools:ignore="TextSizeCheck" />
+
+    <ImageButton
+        android:id="@+id/playlistDeleteBtn"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="114dp"
+        android:layout_marginTop="130dp"
+        android:layout_marginEnd="5dp"
+        android:backgroundTint="@android:color/transparent"
+        android:contentDescription="playlist_delete"
+        android:src="@android:drawable/ic_menu_delete"
+        app:tint="?attr/themeColor" />
+
+</com.google.android.material.card.MaterialCardView>
