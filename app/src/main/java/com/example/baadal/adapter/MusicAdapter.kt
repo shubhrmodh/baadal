@@ -14,6 +14,8 @@ import com.example.baadal.model.Music
 import com.example.baadal.model.formatDuration
 import com.example.baadal.screen.MainActivity
 import com.example.baadal.screen.PlayerActivity
+import com.example.baadal.screen.PlaylistActivity
+import com.example.baadal.widget.PlaylistDetails
 
 class MusicAdapter(
     private val context: Context,
@@ -45,6 +47,7 @@ class MusicAdapter(
 
         if(!selectionActivity) {
             holder.root.setOnLongClickListener {
+//                val customDialog =
                 return@setOnLongClickListener true
             }
         }
@@ -86,12 +89,19 @@ class MusicAdapter(
     }
 
     private fun addSong(song: Music): Boolean {
+        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.forEachIndexed { index, music ->
+            if (song.id == music.id) {
+                PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.removeAt(index)
+                return false
+            }
+        }
+        PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist.add(song)
         return true
     }
 
     fun refreshPlayList() {
         musicList = ArrayList()
-//        musicList = PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist
+        musicList = PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist
         notifyDataSetChanged()
     }
 }

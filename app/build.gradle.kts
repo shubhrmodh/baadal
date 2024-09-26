@@ -55,4 +55,6 @@ dependencies {
     annotationProcessor(libs.compiler)
     implementation(libs.androidx.media)
     implementation(libs.gson)
+    implementation(libs.android.mail)
+    implementation(libs.android.activation)
 }

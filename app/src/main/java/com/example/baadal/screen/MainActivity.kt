@@ -22,8 +22,12 @@ import com.example.baadal.R
 import com.example.baadal.adapter.MusicAdapter
 import com.example.baadal.databinding.ActivityMainBinding
 import com.example.baadal.model.Music
+import com.example.baadal.model.MusicPlaylist
 import com.example.baadal.model.exitApplication
 import com.example.baadal.model.setDialogBtnBackground
+import com.example.baadal.widget.AboutActivity
+import com.example.baadal.widget.FeedbackActivity
+import com.example.baadal.widget.SettingsActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -82,7 +86,12 @@ class MainActivity : AppCompatActivity() {
                 val data : ArrayList<Music> = GsonBuilder().create().fromJson(jsonString, typeToken)
                 FavouriteActivity.favouriteSongs.addAll(data)
             }
-
+            PlaylistActivity.musicPlaylist = MusicPlaylist()
+            val jsonStringPlaylist = editor.getString("MusicPlaylist", null)
+            if(jsonStringPlaylist != null){
+                val dataPlaylist: MusicPlaylist = GsonBuilder().create().fromJson(jsonStringPlaylist, MusicPlaylist::class.java)
+                PlaylistActivity.musicPlaylist = dataPlaylist
+            }
         }
 
         mainBinding.favBtn.setOnClickListener {
@@ -99,9 +108,9 @@ class MainActivity : AppCompatActivity() {
 
         mainBinding.navView.setNavigationItemSelectedListener {
             when(it.itemId) {
-                R.id.navFeedback -> startActivity(Intent(this, FavouriteActivity::class.java))
-                R.id.navSettings -> startActivity(Intent(this, FavouriteActivity::class.java))
-                R.id.navAbout -> startActivity(Intent(this, FavouriteActivity::class.java))
+                R.id.navFeedback -> startActivity(Intent(this, FeedbackActivity::class.java))
+                R.id.navSettings -> startActivity(Intent(this, SettingsActivity::class.java))
+                R.id.navAbout -> startActivity(Intent(this, AboutActivity::class.java))
                 R.id.navExit -> {
                     val builder = MaterialAlertDialogBuilder(this).setTitle("Exit")
                         .setMessage("Do you want to close app?")
@@ -236,9 +245,17 @@ class MainActivity : AppCompatActivity() {
         val editor = getSharedPreferences("FAVOURITES", MODE_PRIVATE).edit()
         val jsonString = GsonBuilder().create().toJson(FavouriteActivity.favouriteSongs)
         editor.putString("FavouriteSongs", jsonString)
-//        val jsonStringPlaylist = GsonBuilder().create().toJson(PlaylistActivity.musicPlaylist)
-//        editor.putString("MusicPlaylist", jsonStringPlaylist)
+        val jsonStringPlaylist = GsonBuilder().create().toJson(PlaylistActivity.musicPlaylist)
+        editor.putString("MusicPlaylist", jsonStringPlaylist)
         editor.apply()
+
+        val sortEditor = getSharedPreferences("SORTING", MODE_PRIVATE)
+        val sortValue = sortEditor.getInt("sortOrder", 0)
+        if (sortOrder != sortValue) {
+            sortOrder = sortValue
+            MusicListMA = getAllAudio()
+            musicAdapter.updateMusicList(MusicListMA)
+        }
         if (PlayerActivity.musicService != null) mainBinding.nowPlaying.visibility = View.VISIBLE
     }
 

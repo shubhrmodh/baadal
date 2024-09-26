@@ -10,6 +10,8 @@
         android:maxSdkVersion="32"
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
@@ -25,18 +27,46 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Baadal"
         tools:targetApi="31">
+        <activity
+            android:name=".widget.PlayNext"
+            android:exported="false" />
+        <activity
+            android:name=".widget.AboutActivity"
+            android:screenOrientation="sensorPortrait"
+            android:configChanges="uiMode|orientation"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
+        <activity
+            android:name=".widget.SettingsActivity"
+            android:screenOrientation="sensorPortrait"
+            android:configChanges="uiMode|orientation"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
+        <activity
+            android:name=".widget.FeedbackActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
+        <activity
+            android:name=".widget.SelectionActivity"
+            android:screenOrientation="sensorPortrait"
+            android:configChanges="uiMode|orientation"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
+        <activity
+            android:name=".widget.PlaylistDetails"
+            android:exported="false"
+            android:screenOrientation="sensorPortrait"
+            android:configChanges="uiMode|orientation"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity" />
+
         <receiver
             android:name=".model.NotificationReceiver"
             android:enabled="true"
-            android:exported="false">
-        </receiver>
+            android:exported="false" />
 
         <service
             android:name=".model.MusicService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="mediaPlayback">
-        </service>
+            android:foregroundServiceType="mediaPlayback" />
 
         <activity
             android:name=".screen.PlaylistActivity"

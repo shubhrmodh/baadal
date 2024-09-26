@@ -7,6 +7,7 @@ import android.content.ServiceConnection
 import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.graphics.drawable.GradientDrawable
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.audiofx.AudioEffect
 import android.media.audiofx.LoudnessEnhancer
@@ -33,6 +34,7 @@ import com.example.baadal.model.getMainColor
 import com.example.baadal.model.setDialogBtnBackground
 import com.example.baadal.model.setSongPosition
 import com.example.baadal.widget.NowPlaying
+import com.example.baadal.widget.PlaylistDetails
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -172,6 +174,11 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
             "FavouriteAdapter" -> initServiceAndPlaylist(FavouriteActivity.favouriteSongs, shuffle = false)
             "MainActivity" -> initServiceAndPlaylist(MainActivity.MusicListMA, shuffle = true)
             "FavouriteShuffle" -> initServiceAndPlaylist(FavouriteActivity.favouriteSongs, shuffle = true)
+            "PlaylistDetailsAdapter"->
+                initServiceAndPlaylist(PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist, shuffle = false)
+            "PlaylistDetailsShuffle"->
+                initServiceAndPlaylist(PlaylistActivity.musicPlaylist.ref[PlaylistDetails.currentPlaylistPos].playlist, shuffle = true)
+//            "PlayNext"->initServiceAndPlaylist(PlayNext.playNextList, shuffle = false, playNext = true)
         }
         if (musicService != null && !isPlaying) playMusic()
     }
@@ -320,7 +327,8 @@ class PlayerActivity : AppCompatActivity(), ServiceConnection, MediaPlayer.OnCom
         if (musicService == null){
             val binder = service as MusicService.MyBinder
             musicService = binder.currentService()
-//            musicService!!.aud
+            musicService!!.audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+            musicService!!.audioManager.requestAudioFocus(musicService, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
         }
         createMediaPlayer()
         musicService!!.seekBarSetup()
