@@ -26,7 +26,6 @@ import com.example.baadal.model.MusicPlaylist
 import com.example.baadal.model.exitApplication
 import com.example.baadal.model.setDialogBtnBackground
 import com.example.baadal.widget.AboutActivity
-import com.example.baadal.widget.FeedbackActivity
 import com.example.baadal.widget.SettingsActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.GsonBuilder
@@ -50,8 +49,7 @@ class MainActivity : AppCompatActivity() {
         val currentThemeNav = arrayOf(
             R.style.coolBlueNav, R.style.coolPurpleNav, R.style.coolGreenNav, R.style.coolBlackNav
         )
-//        val currentGradient = arrayOf(R.drawable.gradient_pink, R.drawable.gradient_blue, R.drawable.gradient_purple, R.drawable.gradient_green,
-//            R.drawable.gradient_black)
+        val currentGradient = arrayOf(R.drawable.gradient_blue, R.drawable.gradient_purple, R.drawable.gradient_green)
         var sortOrder: Int = 0
         val sortingList = arrayOf(
             MediaStore.Audio.Media.DATE_ADDED + " DESC", MediaStore.Audio.Media.TITLE,
@@ -108,7 +106,7 @@ class MainActivity : AppCompatActivity() {
 
         mainBinding.navView.setNavigationItemSelectedListener {
             when(it.itemId) {
-                R.id.navFeedback -> startActivity(Intent(this, FeedbackActivity::class.java))
+//                R.id.navFeedback -> startActivity(Intent(this, FeedbackActivity::class.java))
                 R.id.navSettings -> startActivity(Intent(this, SettingsActivity::class.java))
                 R.id.navAbout -> startActivity(Intent(this, AboutActivity::class.java))
                 R.id.navExit -> {
