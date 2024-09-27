@@ -153,7 +153,7 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
         NowPlaying.nowPlayingBinding.songNameNP.text = PlayerActivity.musicListPA[PlayerActivity.songPosition].title
         playMusic()
 
-//        PlayerActivity.fIndex = favouriteChecker(PlayerActivity.musicListPA[PlayerActivity.songPosition].id)
+        PlayerActivity.fIndex = favouriteChecker(PlayerActivity.musicListPA[PlayerActivity.songPosition].id)
         if(PlayerActivity.isFavourite) PlayerActivity.playerBinding.favouriteBtnPA.setImageResource(R.drawable.ic_favorite)
         else PlayerActivity.playerBinding.favouriteBtnPA.setImageResource(R.drawable.fav_outlined)
 
@@ -183,13 +183,13 @@ class MusicService : Service(), AudioManager.OnAudioFocusChangeListener {
 
     private fun getPlayBackState(): PlaybackStateCompat {
         val playbackSpeed = if (PlayerActivity.isPlaying) 1F else 0F
-         return PlaybackStateCompat.Builder().setState(
-             if (mediaPlayer?.isPlaying == true) PlaybackStateCompat.STATE_PLAYING
-             else PlaybackStateCompat.STATE_PAUSED,
-             mediaPlayer!!.currentPosition.toLong(), playbackSpeed)
-             .setActions(PlaybackStateCompat.ACTION_PLAY_PAUSE or PlaybackStateCompat.ACTION_SEEK_TO
-                     or PlaybackStateCompat.ACTION_SKIP_TO_NEXT or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
-             .build()
+        return PlaybackStateCompat.Builder().setState(
+            if (mediaPlayer?.isPlaying == true) PlaybackStateCompat.STATE_PLAYING
+            else PlaybackStateCompat.STATE_PAUSED,
+            mediaPlayer!!.currentPosition.toLong(), playbackSpeed)
+            .setActions(PlaybackStateCompat.ACTION_PLAY_PAUSE or PlaybackStateCompat.ACTION_SEEK_TO
+                 or PlaybackStateCompat.ACTION_SKIP_TO_NEXT or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
+            .build()
     }
 
     fun createMediaPlayer() {

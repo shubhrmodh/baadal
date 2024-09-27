@@ -1,6 +1,7 @@
 package com.example.baadal.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -13,6 +14,7 @@ import com.example.baadal.model.Playlist
 import com.example.baadal.model.setDialogBtnBackground
 import com.example.baadal.screen.MainActivity
 import com.example.baadal.screen.PlaylistActivity
+import com.example.baadal.widget.PlaylistDetails
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class PlaylistAdapter(
@@ -53,7 +55,9 @@ class PlaylistAdapter(
             setDialogBtnBackground(context, customDialog)
         }
         holder.root.setOnClickListener {
-//            val intent = Intent(context, Playlist)
+            val intent = Intent(context, PlaylistDetails::class.java)
+            intent.putExtra("index", position)
+            ContextCompat.startActivity(context, intent, null)
         }
 
         if (PlaylistActivity.musicPlaylist.ref[position].playlist.size > 0){
