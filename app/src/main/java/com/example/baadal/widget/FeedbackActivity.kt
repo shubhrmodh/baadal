@@ -5,7 +5,10 @@
 //import android.os.Bundle
 //import android.util.Log
 //import android.widget.Toast
-//import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.example.baadal.databinding.ActivityFeedbackBinding
+
 //import com.example.baadal.databinding.ActivityFeedbackBinding
 //import com.example.baadal.screen.MainActivity
 //import javax.mail.Authenticator
@@ -16,12 +19,12 @@
 //import javax.mail.internet.InternetAddress
 //import javax.mail.internet.MimeMessage
 //
-//class FeedbackActivity : AppCompatActivity() {
+class FeedbackActivity : AppCompatActivity() {
 //
-//    lateinit var binding: ActivityFeedbackBinding
+    lateinit var binding: ActivityFeedbackBinding
 //
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 //        setTheme(MainActivity.currentTheme[MainActivity.themeIndex])
 //        binding = ActivityFeedbackBinding.inflate(layoutInflater)
 //        setContentView(binding.root)
@@ -61,5 +64,5 @@
 //            }
 //            else Toast.makeText(this, "Something Went Wrong!!", Toast.LENGTH_SHORT).show()
 //        }
-//    }
-//}
+    }
+}

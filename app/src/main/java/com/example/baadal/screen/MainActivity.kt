@@ -26,6 +26,7 @@ import com.example.baadal.model.MusicPlaylist
 import com.example.baadal.model.exitApplication
 import com.example.baadal.model.setDialogBtnBackground
 import com.example.baadal.widget.AboutActivity
+import com.example.baadal.widget.ExoPlayer
 import com.example.baadal.widget.SettingsActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.GsonBuilder
@@ -106,7 +107,7 @@ class MainActivity : AppCompatActivity() {
 
         mainBinding.navView.setNavigationItemSelectedListener {
             when(it.itemId) {
-//                R.id.navFeedback -> startActivity(Intent(this, FeedbackActivity::class.java))
+                R.id.navFeedback -> startActivity(Intent(this, ExoPlayer::class.java))
                 R.id.navSettings -> startActivity(Intent(this, SettingsActivity::class.java))
                 R.id.navAbout -> startActivity(Intent(this, AboutActivity::class.java))
                 R.id.navExit -> {
