@@ -57,4 +57,5 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.android.mail)
     implementation(libs.android.activation)
+    implementation (libs.exoplayer)
 }
