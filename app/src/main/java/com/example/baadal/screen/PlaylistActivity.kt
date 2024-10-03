@@ -75,8 +75,8 @@ class PlaylistActivity : AppCompatActivity() {
         if(playlistExists) Toast.makeText(this, "Playlist Exist!!", Toast.LENGTH_SHORT).show()
         else {
             val tempPlaylist = Playlist()
-            tempPlaylist.name = name
-            tempPlaylist.playlist = ArrayList()
+//            tempPlaylist.name = name
+//            tempPlaylist.playlist = ArrayList()
             tempPlaylist.createdBy = createdBy
             val calendar = Calendar.getInstance().time
             val sdf = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
